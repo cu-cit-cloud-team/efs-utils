@@ -47,3 +47,4 @@ jobs:
         tag_name: ${{ inputs.version }}
         files: build/amazon-efs-utils*.deb
         fail_on_unmatched_files: true
+        make_latest: false
