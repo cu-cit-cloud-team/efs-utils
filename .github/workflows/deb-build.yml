@@ -25,7 +25,8 @@ jobs:
     - name: Get package name
       id: get_package_name
       run: |
-        echo "PACKAGE_NAME=$(ls -1 build/amazon-efs-utils*.deb | head -1 | tr -d '\n')" >> $GITHUB_OUTPUT
+        cd build
+        echo "PACKAGE_NAME=$(ls -1 amazon-efs-utils*.deb | head -1 | tr -d '\n')" >> $GITHUB_OUTPUT
   
     - name: Publish package
       uses: actions/upload-artifact@v4
