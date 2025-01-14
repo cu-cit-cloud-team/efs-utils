@@ -7,21 +7,36 @@ jobs:
   build:
     runs-on: ubuntu-24.04
 
+    permissions:
+      contents: write
+
     steps:
     - uses: actions/checkout@v4
 
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libcurl4-openssl-dev
         sudo apt-get -y install git binutils rustc cargo pkg-config libssl-dev gettext
 
     - name: Build DEB package
       run: |
         ./build-deb.sh
 
-    - name: Upload artifacts
+    - name: Get package name
+      id: get_package_name
+      run: |
+        echo "PACKAGE_NAME=$(ls -1 build/amazon-efs-utils*.deb | head -1 | tr -d '\n')" >> $GITHUB_OUTPUT
+  
+    - name: Publish package
       uses: actions/upload-artifact@v4
       with:
-        name: efs-utils-package
+        name: ${{ steps.get_package_name.outputs.PACKAGE_NAME }}
         path: build/amazon-efs-utils*.deb
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        name: ${{ steps.get_package_name.outputs.PACKAGE_NAME }}
+        files: build/amazon-efs-utils*.deb
+        fail_on_unmatched_files: true
+        make_latest: true
