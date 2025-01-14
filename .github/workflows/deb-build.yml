@@ -40,24 +40,24 @@ jobs:
         name: ${{ steps.get_package_name.outputs.PACKAGE_NAME }}
         path: build/amazon-efs-utils*.deb
 
-  release:
-    needs: build
-    runs-on: ubuntu-24.04
+  # release:
+  #   needs: build
+  #   runs-on: ubuntu-24.04
 
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        ref: ref/tags/${{ inputs.version }}
+  #   steps:
+  #   - uses: actions/checkout@v4
+  #     with:
+  #       ref: ref/tags/${{ inputs.version }}
 
-    - name: Download artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: ${{ needs.build.outputs.PACKAGE_NAME }}
+  #   - name: Download artifact
+  #     uses: actions/download-artifact@v4
+  #     with:
+  #       name: ${{ needs.build.outputs.PACKAGE_NAME }}
 
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
-        tag: ${{ inputs.version }}
-        files: ${{ needs.build.outputs.PACKAGE_NAME }}
+        tag_name: ${{ inputs.version }}
+        files: build/amazon-efs-utils*.deb
         fail_on_unmatched_files: true
         make_latest: true
