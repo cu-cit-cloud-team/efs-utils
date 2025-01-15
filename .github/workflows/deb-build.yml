@@ -9,10 +9,11 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        ubuntu-version: ["20", "24"]
 
-    permissions:
-      contents: write
+    runs-on: ubuntu-${{ matrix.ubuntu-version }}.04
 
     steps:
     - name: Checkout
@@ -38,13 +39,36 @@ jobs:
     - name: Publish package
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ steps.get_package_name.outputs.PACKAGE_NAME }}
+        name: ${{ matrix.ubuntu-version }}-${{ steps.get_package_name.outputs.PACKAGE_NAME }}
         path: build/amazon-efs-utils*.deb
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: ubuntu-20.04-${{ needs.build.outputs.PACKAGE_NAME }}
+
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: ubuntu-24.04-${{ needs.build.outputs.PACKAGE_NAME }}
+
+    - name: Verify artifacts
+      run: |
+        ls -l *.deb
 
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ inputs.version }}
-        files: build/amazon-efs-utils*.deb
+        files: *.deb
         fail_on_unmatched_files: true
         make_latest: false
