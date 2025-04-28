@@ -11,7 +11,7 @@ jobs:
   build:
     strategy:
       matrix:
-        ubuntu-version: ["20", "24"]
+        ubuntu-version: ["20", "22", "24"]
 
     runs-on: ubuntu-${{ matrix.ubuntu-version }}.04
 
